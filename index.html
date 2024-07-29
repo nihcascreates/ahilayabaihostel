@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Room Finder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .input-container {
+            margin-top: 20px;
+        }
+        .input-container input {
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+            width: 200px;
+        }
+        .input-container button {
+            padding: 10px;
+            font-size: 16px;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Student Room Finder</h1>
+    <p>Enter your roll number below to find your room details.</p>
+
+    <div class="input-container">
+        <input type="text" id="rollNo" placeholder="Enter Roll Number">
+        <button onclick="findRoom()">Find Room</button>
+    </div>
+
+    <div id="result"></div>
+
+    <script>
+        const sheetId = '1-u24egI-chCpNKWapJ-k78Qrt96IhK53NMigbzzSl_U'; // Replace with your sheet ID
+        const base = `https://spreadsheets.google.com/feeds/list/${sheetId}/1/public/values?alt=json`;
+
+        async function fetchData() {
+            const response = await fetch(base);
+            const data = await response.json();
+            return data.feed.entry.map(entry => ({
+                rollNo: entry.gsx$rollno.$t,
+                roomNo: entry.gsx$roomno.$t,
+                roomType: entry.gsx$roomtype.$t
+            }));
+        }
+
+        async function findRoom() {
+            const rollNo = document.getElementById('rollNo').value.trim();
+            const studentData = await fetchData();
+            const student = studentData.find(student => student.rollNo === rollNo);
+
+            if (student) {
+                document.getElementById('result').textContent = `Room No: ${student.roomNo}, Room Type: ${student.roomType}`;
+            } else {
+                document.getElementById('result').textContent = 'Roll number not found. Please try again.';
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+ 
